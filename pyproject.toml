@@ -1,0 +1,14 @@
+[project]
+name = "multi-agent-ai-code-reviewer"
+version = "0.1.0"
+description = "FastAPI based multi-agent AI code reviewer for GitHub"
+authors = [{name = "Your Name", email = "you@example.com"}]
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*", "scripts*", "tests*"]
