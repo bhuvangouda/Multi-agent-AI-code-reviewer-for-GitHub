@@ -9,7 +9,7 @@ from app.database import AsyncSessionLocal, get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from datetime import datetime
-
+import asyncio
 router = APIRouter()
 
 def verify_signature(secret: str, signature: str, payload: bytes) -> bool:
@@ -29,6 +29,7 @@ def verify_signature(secret: str, signature: str, payload: bytes) -> bool:
 
 @router.post("/webhook")
 async def github_webhook(request: Request, db: AsyncSession = Depends(get_db)):
+    """Handle GitHub webhook events."""
     # GitHub delivery ID for deduplication
     delivery_id = request.headers.get('X-GitHub-Delivery')
     event = request.headers.get('X-GitHub-Event')
@@ -68,7 +69,7 @@ async def github_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     if event == "pull_request":
         action = payload.get("action")
         if action in {"opened", "reopened", "synchronize"}:
-            # Enqueue background job (fire‑and‑forget)
-            enqueue_review(webhook_entry.id)
+            # Directly await enqueue_review to ensure job is queued before response
+            await enqueue_review(webhook_entry.id)
 
     return {"status": "accepted"}
